@@ -1,4 +1,4 @@
-This project contains a script that uses [PocketSphinx](cmusphinx.sourceforge.net/) to produce captions
+This project contains a script that uses [PocketSphinx](https://cmusphinx.sourceforge.net/) to produce captions
 from a video file using speech recognition. The dependencies are a bit tricky,
 a Dockerfile is provided to produce a working environment. Specifically,
 the script currently relies on [an unlanded patch](https://github.com/luser/pocketsphinx/commit/18f6755caafd04726e76569aa7daa7c6211ea05e) to the PocketSphinx
