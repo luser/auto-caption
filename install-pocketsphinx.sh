@@ -13,6 +13,13 @@ make $ncpu
 make install
 
 cd $WORK
+curl -L "http://downloads.sourceforge.net/project/cmusphinx/sphinxtrain/5prealpha/sphinxtrain-5prealpha.tar.gz?r=&ts=1447879028&use_mirror=superb-dca2" | tar xzf -
+cd sphinxtrain-*
+./configure
+make $ncpu
+make install
+
+cd $WORK
 curl -L https://github.com/luser/pocketsphinx/archive/gst-extra-timestamps.tar.gz | tar xzf -
 cd pocketsphinx-gst-extra-timestamps
 ./autogen.sh

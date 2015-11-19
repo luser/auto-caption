@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+#
+# Any copyright is dedicated to the Public Domain.
+# http://creativecommons.org/publicdomain/zero/1.0/
+
 from __future__ import print_function
 
 import argparse
@@ -50,8 +54,8 @@ def run_pipeline(url=None, hmm=None, lm=None, dict=None,
                 if struct and struct.get_name() == 'pocketsphinx':
                     if struct['final']:
                         c = Caption()
-                        c.start = struct['start_time'] / Gst.USECOND;
-                        c.end = struct['end_time'] / Gst.USECOND;
+                        c.start = struct['start_time'] / Gst.USECOND
+                        c.end = struct['end_time'] / Gst.USECOND
                         c.nodes.append(CaptionNode.create_text(struct['hypothesis']))
                         captions.append(c)
         except KeyboardInterrupt:
