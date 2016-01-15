@@ -15,8 +15,8 @@ from pycaption import SRTWriter, WebVTTWriter, CaptionSet, Caption, CaptionNode
 GObject.threads_init()
 Gst.init(None)
 
-def run_pipeline(url=None, hmm=None, lm=None, dict=None,
-                 caption_format='webvtt', out_file=None):
+def caption(url=None, hmm=None, lm=None, dict=None,
+            caption_format='webvtt'):
     if url is None:
         raise Exception('No URL specified!')
     pipeline = Gst.parse_launch('uridecodebin name=source ! audioconvert !' +
@@ -37,8 +37,8 @@ def run_pipeline(url=None, hmm=None, lm=None, dict=None,
     # Start playing
     pipeline.set_state(Gst.State.PLAYING)
 
-    cap_set = CaptionSet()
-    captions = []
+    writer = WebVTTWriter()
+    yield writer.HEADER
 
     # Wait until error or EOS
     while True:
@@ -57,22 +57,20 @@ def run_pipeline(url=None, hmm=None, lm=None, dict=None,
                         c.start = struct['start_time'] / Gst.USECOND
                         c.end = struct['end_time'] / Gst.USECOND
                         c.nodes.append(CaptionNode.create_text(struct['hypothesis']))
-                        captions.append(c)
+                        yield writer._write_caption(c)
         except KeyboardInterrupt:
             pipeline.send_event(Gst.Event.new_eos())
 
     # Free resources
     pipeline.set_state(Gst.State.NULL)
 
-    cap_set.set_captions('en-US', captions)
-    writer = SRTWriter() if caption_format == 'srt' else WebVTTWriter()
-    caption_data = writer.write(cap_set)
-    if out_file is not None:
-        codecs.open(out_file, 'w', 'utf-8').write(caption_data)
-    else:
-        print(caption_data)
 
-if __name__ == '__main__':
+def print_captions(**kwargs):
+    for c in caption(**kwargs):
+        print(c)
+
+
+def get_parser():
     parser = argparse.ArgumentParser(description='Recognize speech from audio')
     parser.add_argument('url', help='URL to a media file')
     parser.add_argument('--hmm',
@@ -81,10 +79,9 @@ if __name__ == '__main__':
                         help='Path to a pocketsphinx language model file')
     parser.add_argument('--dict',
                         help='Path to a pocketsphinx CMU dictionary file')
-    parser.add_argument('--caption-format', choices=['srt', 'webvtt'],
-                        default='webvtt',
-                        help='Format of output captions')
-    parser.add_argument('--out-file', metavar='FILE',
-                        help='Write captions to FILE (default is stdout)')
+    return parser
+
+if __name__ == '__main__':
+    parser = get_parser()
     args = parser.parse_args()
-    run_pipeline(**vars(args))
+    print_captions(**vars(args))
